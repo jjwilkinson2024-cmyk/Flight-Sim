@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>FlightDeck — Global A320 Simulator</title>
+<link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.127/Build/Cesium/Widgets/widgets.css">
+<link rel="stylesheet" href="style.css">
+<script>window.CESIUM_BASE_URL='https://cesium.com/downloads/cesiumjs/releases/1.127/Build/Cesium/';</script>
+<script src="https://cesium.com/downloads/cesiumjs/releases/1.127/Build/Cesium/Cesium.js"></script>
+</head>
+<body>
+<div id="app">
+ <div id="globe"></div>
+ <header class="topbar">
+  <div class="brand"><span class="mark">FD</span><div><b>FLIGHTDECK</b><small>GLOBAL FLIGHT SIMULATOR · BUILD 0.3</small></div></div>
+  <div class="meta"><i></i><span id="phase">PARKED</span><span class="sep"></span><span id="location">EGLL · LONDON HEATHROW</span></div>
+  <button id="settingsBtn" class="icon">☰</button>
+ </header>
+ <aside class="left glass">
+  <div class="panel-title">FLIGHT INSTRUMENTS <span class="live">LIVE</span></div>
+  <div class="speedrow"><div><small>INDICATED AIRSPEED</small><strong id="ias">000</strong><em>KTS</em></div><div><small>ALTITUDE</small><strong id="alt">00000</strong><em>FT</em></div></div>
+  <div class="stats">
+   <div><small>VERTICAL SPEED</small><b id="vs">+000</b><em>FT/MIN</em></div><div><small>HEADING</small><b id="hdg">270°</b><em>MAG</em></div>
+   <div><small>PITCH</small><b id="pitch">+00.0°</b><em>DEG</em></div><div><small>BANK</small><b id="bank">+00.0°</b><em>DEG</em></div>
+  </div>
+  <div class="rule"></div><div class="panel-title">AIRCRAFT STATUS</div>
+  <div class="status"><span>ENGINE 1</span><div class="meter"><i id="eng1"></i></div><b id="eng1v">0%</b></div>
+  <div class="status"><span>ENGINE 2</span><div class="meter"><i id="eng2"></i></div><b id="eng2v">0%</b></div>
+  <div class="status"><span>FLAPS</span><b id="flapStatus">0</b></div><div class="status"><span>GEAR</span><b id="gearStatus">DOWN</b></div>
+  <div class="status"><span>AUTOPILOT</span><b id="apStatus">OFF</b></div>
+  <div class="rule"></div><div class="panel-title">POSITION</div>
+  <div class="coords"><span>LAT <b id="lat">51.4700° N</b></span><span>LON <b id="lon">0.4543° W</b></span></div>
+ </aside>
+ <aside class="right glass">
+  <div class="panel-title">CAMERA</div>
+  <div class="camlist">
+   <button class="cam active" data-cam="chase"><span>01</span><div><b>Chase</b><small>External follow</small></div><kbd>1</kbd></button>
+   <button class="cam" data-cam="cockpit"><span>02</span><div><b>Cockpit</b><small>Forward view</small></div><kbd>2</kbd></button>
+   <button class="cam" data-cam="wing"><span>03</span><div><b>Wing</b><small>Aircraft side</small></div><kbd>3</kbd></button>
+   <button class="cam" data-cam="tower"><span>04</span><div><b>Spotter</b><small>Wide external</small></div><kbd>4</kbd></button>
+   <button class="cam" data-cam="orbit"><span>05</span><div><b>Orbit</b><small>Inspect aircraft</small></div><kbd>5</kbd></button>
+  </div>
+  <div class="rule"></div><div class="panel-title">FLIGHT CONTROLS</div>
+  <div class="pair"><button id="apBtn" class="ctrl">AUTOPILOT<b>OFF</b></button><button id="pauseBtn" class="ctrl">SIMULATION<b>RUNNING</b></button></div>
+  <div class="pair"><button id="gearBtn" class="ctrl">LANDING GEAR<b>DOWN</b></button><button id="brakeBtn" class="ctrl active">BRAKES<b>ON</b></button></div>
+  <div class="row"><label for="flaps">FLAPS</label><select id="flaps"><option value="0">0 — UP</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">FULL</option></select></div>
+  <div class="row"><label for="throttle">THROTTLE</label><b id="thrText">0%</b></div><input id="throttle" type="range" min="0" max="100" value="0">
+  <div class="row"><label for="weather">WEATHER / LIGHT</label></div><select id="weather" class="wide"><option value="day">Daylight</option><option value="dusk">Golden hour</option><option value="night">Night</option><option value="storm">Low visibility / storm preset</option></select>
+  <div class="row"><label for="airport">QUICK POSITION</label></div><select id="airport" class="wide"><option value="heathrow">London Heathrow (EGLL)</option><option value="newyork">New York (KJFK)</option><option value="paris">Paris CDG (LFPG)</option><option value="sydney">Sydney (YSSY)</option><option value="dubai">Dubai (OMDB)</option><option value="tokyo">Tokyo Haneda (RJTT)</option></select>
+  <button id="spawnBtn" class="fullbtn">SPAWN AT AIRPORT</button>
+  <div class="rule"></div><div class="panel-title">FLIGHT MANAGEMENT</div>
+  <div class="row"><label for="routeAirport">DESTINATION</label></div>
+  <select id="routeAirport" class="wide">
+   <option value="newyork">New York JFK</option><option value="paris">Paris CDG</option>
+   <option value="sydney">Sydney</option><option value="dubai">Dubai</option><option value="tokyo">Tokyo Haneda</option><option value="heathrow">London Heathrow</option>
+  </select>
+  <button id="routeBtn" class="fullbtn">LOAD DIRECT ROUTE</button>
+  <div class="status"><span>DESTINATION</span><b id="destStatus">NONE</b></div>
+  <div class="status"><span>ROUTE DIST.</span><b id="distStatus">— NM</b></div>
+  <div class="pair"><button id="setHdgBtn" class="ctrl">SET HEADING<b id="apHdgText">270°</b></button><button id="setAltBtn" class="ctrl">SET ALTITUDE<b id="apAltText">10,000 FT</b></button></div>
+  <div class="rule"></div><div class="panel-title">ATC RADIO <span class="live">SIMULATED</span></div>
+  <div id="atcLog" class="atc-log">GROUND: FlightDeck, radio check. Select an airport to begin.</div>
+  <div class="pair"><button id="requestTaxi" class="ctrl">REQUEST<b>TAXI</b></button><button id="requestTakeoff" class="ctrl">REQUEST<b>TAKEOFF</b></button></div>
+  <div class="pair"><button id="requestLanding" class="ctrl">REQUEST<b>LANDING</b></button><button id="requestWeather" class="ctrl">ATIS<b>WEATHER</b></button></div>
+ </aside>
+ <div class="pfd glass">
+  <div class="pfd-head"><b>PRIMARY FLIGHT DISPLAY</b><span id="fdMode">FD OFF</span></div>
+  <div class="horizon-window"><div id="horizonSky" class="horizon-sky"><div class="horizon-line"></div><div class="pitch-mark p1">10</div><div class="pitch-mark p2">5</div><div class="pitch-mark p3">5</div><div class="pitch-mark p4">10</div></div><div class="aircraft-symbol">⌑</div><div class="bank-scale">⌒</div></div>
+  <div class="pfd-foot"><span>IAS <b id="pfdIas">000</b></span><span>ALT <b id="pfdAlt">00000</b></span><span>VS <b id="pfdVs">+000</b></span></div>
+</div>
+<div class="traffic-badge glass">TRAFFIC <b id="trafficCount">03</b> <span>· SIMULATED</span></div>
+ <div class="bottom glass"><b>FLIGHTDECK</b><span id="hint">W/S pitch · A/D roll · Q/E rudder · Shift/Ctrl throttle · G gear · B brakes</span><button id="resetBtn">↺ RESET</button><button id="fullscreenBtn">⛶ FULLSCREEN</button></div>
+ <div id="settings" class="settings glass hidden">
+  <div class="settingsHead"><b>WORLD DATA SETUP</b><button id="closeSettings" class="icon">✕</button></div>
+  <p>CesiumJS streams a real globe. Add your own Cesium ion access token to enable Cesium World Terrain and 3D buildings. Satellite imagery uses a public ArcGIS imagery layer. Provider terms and usage limits apply.</p>
+  <label>CESIUM ION ACCESS TOKEN (OPTIONAL)</label><input id="token" type="password" placeholder="Paste your own token">
+  <button id="applyToken" class="fullbtn">ENABLE TERRAIN & BUILDINGS</button>
+  <small id="tokenStatus">Without a token: global globe + satellite imagery; terrain/building layers may be unavailable.</small>
+  <p class="notice">This build is a prototype. Aircraft systems, ATC, traffic and flight dynamics are simplified simulations, not an accurate or certified A320 simulation. Internet access is required for streamed map data.</p>
+ </div>
+ <div id="toast" class="toast"></div>
+</div>
+<script src="main.js"></script>
+</body></html>
